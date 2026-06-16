@@ -1,0 +1,47 @@
+services:
+  app:
+    build: .
+    ports:
+      - "3001:3000"
+    environment:
+      PORT: 3000
+      MONGODB_URI: mongodb://mongo:27017/17thstudio
+      REDIS_URL: redis://redis:6379
+      QUEUE_NAME: default
+      PINO_LOG_LEVEL: info
+      LOG_APP_REQUEST: 1
+    depends_on:
+      mongo:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    restart: unless-stopped
+
+  mongo:
+    image: mongo:8
+    ports:
+      - "27018:27017"
+    volumes:
+      - mongo_data:/data/db
+    healthcheck:
+      test: ["CMD", "mongosh", "--eval", "db.adminCommand('ping')"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6380:6379"
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  mongo_data:
+  redis_data:

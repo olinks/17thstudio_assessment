@@ -1,0 +1,11 @@
+node_modules
+.env
+*.env
+*.logs
+.git
+.vscode
+.DS_Store
+playground
+testlogs
+endpoint-data
+npm-debug.log*
