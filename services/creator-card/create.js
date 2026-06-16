@@ -8,7 +8,7 @@ const { serializeCard } = require('./helpers');
 
 const createSpec = `root {
   title string<minLength:3|maxLength:100>
-  description? string
+  description? string<maxLength:500>
   slug? string<minLength:5|maxLength:50>
   creator_reference string<length:20>
   links[]? {
@@ -106,7 +106,10 @@ async function createCreatorCard(payload) {
     }
     slug = providedSlug;
   } else {
-    const baseSlug = generateSlugFromTitle(title);
+    let baseSlug = generateSlugFromTitle(title);
+    if (baseSlug.length < 5) {
+      baseSlug = `${baseSlug}-${randomBytes(6)}`;
+    }
     const existing = await creatorCardRepo.findOne({ query: { slug: baseSlug } });
     if (existing) {
       slug = `${baseSlug}-${randomBytes(6)}`;
